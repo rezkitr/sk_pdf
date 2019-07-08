@@ -9,6 +9,9 @@
 <body>
 
 <h1>ALIF JANCOK</h1>
+<h1>ALIF JANCOK</h1>
+<h1>ALIF JANCOK</h1>
+<h1>ALIF JANCOK</h1>
 
 <h2>Generate PDF file from MySQL Using PHP</h2>
 <form class="form-inline" method="post" action="generate_pdf.php">
