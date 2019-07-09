@@ -204,15 +204,16 @@ $pdf->Ln();
 //DATABASE
 $pdf->SetFont('Arial','',7);
 include ('koneksi.php');
-$karyawan = mysqli_query($connect, "select * from karyawan where nomor = 7");
+$karyawan = mysqli_query($connect, "select * from karyawan where nomor = 2");
 
-while ($row = mysqli_fetch_array($karyawan)) {
-
-    $cellWidth1 = 27;
+$cellWidth1 = 27;
     $cellWidth2 = 38;
     $cellWidth3 = 17;
 
-    $cellHeight =5;
+    $cellHeight1 =5;
+    $cellHeight2 =5;
+    $cellHeight3 =5;
+    $cellHeight = 5;
 
     $errMargin = 5;
     $startChar=0;		
@@ -220,7 +221,10 @@ while ($row = mysqli_fetch_array($karyawan)) {
     $textArray=array();	
     $tmpString="";
 
-    $line=1;
+    $line1 =1;
+
+while ($row = mysqli_fetch_array($karyawan)) {
+    
 
     if($pdf->GetStringWidth($row['nama']) > $cellWidth1 ) {
         
@@ -238,177 +242,73 @@ while ($row = mysqli_fetch_array($karyawan)) {
             $tmpString='';
         }
         
-        $line=count($textArray);
+        $line1=count($textArray);
+        $cellHeight1 = 5 * 2;
 
-        $pdf->Cell(8,($line * $cellHeight),$row['nomor'],1,0,'C');
+        if($pdf->GetStringWidth($row['jabatan']) > $cellWidth2){
+            
+            $textLength = strlen($row['jabatan']);
+            
+            while($startChar < $textLength){
+                while ($pdf->GetStringWidth( $tmpString ) < ($cellWidth2-$errMargin) && ($startChar+$maxChar) < $textLength ) {
+                    $maxChar++;
+                    $tmpString=substr($row['jabatan'],$startChar,$maxChar);
+                }
+                
+                $startChar=$startChar+$maxChar;
+                array_push($textArray,$tmpString);
+                $maxChar=0;
+                $tmpString='';
+            }
+            $line2=count($textArray)+1;
+            $cellHeight2 = $cellHeight2 * $line2;
+
+            if($pdf->GetStringWidth($row['kriteria']) > $cellWidth3){
+                
+                $textLength = strlen($row['kriteria']);
+                
+                while($startChar < $textLength){
+                    while ($pdf->GetStringWidth( $tmpString ) < ($cellWidth3-$errMargin) && ($startChar+$maxChar) < $textLength ) {
+                        $maxChar++;
+                        $tmpString=substr($row['kriteria'],$startChar,$maxChar);
+                    }
+                    $startChar=$startChar+$maxChar;
+                    array_push($textArray,$tmpString);
+                    $maxChar=0;
+                    $tmpString='';
+                }
+                $line3=count($textArray)+1;
+                $cellHeight3 = $cellHeight3 * $line3;
+                
+            }
+        }
+    }
+
+        $pdf->Cell(8,$cellHeight,$row['nomor'],1,0,'C');
 
         $xPos=$pdf->GetX();
         $yPos=$pdf->GetY();
         $pdf->MultiCell($cellWidth1,$cellHeight,$row['nama'],'TB','L');
         $pdf->SetXY($xPos + $cellWidth1 , $yPos);
     
-        $pdf->Cell(17,($line * $cellHeight),$row['nid'],1,0,'C');
-
-        if ($pdf->GetStringWidth($row['jabatan']) > $cellWidth2) {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth2,$cellHeight,$row['jabatan'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth2 , $yPos);
-        }
-        else {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth2,($line * $cellHeight),$row['jabatan'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth2 , $yPos);
-        }
-    
-        $pdf->Cell(11,($line * $cellHeight),$row['unit'],1,0,'C');
-        $pdf->Cell(24,($line * $cellHeight),$row['grade'],'TB');
-        $pdf->Cell(17,($line * $cellHeight),$row['tgl_upgrade'],1,0,'C');
-        $pdf->Cell(16.5,($line * $cellHeight),$row['sasaran'],'TB',0,'C');
-        $pdf->Cell(16.5,($line * $cellHeight),$row['individu'],1,0,'C');
-
-        if ($pdf->GetStringWidth($row['kriteria']) > $cellWidth3) {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth3,$cellHeight,$row['kriteria'],1,'C');
-            $pdf->SetXY($xPos + $cellWidth3 , $yPos);
-            $pdf->Ln(20);
-        }
-        else {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth3,($line * $cellHeight),$row['kriteria'],1,'C');
-            $pdf->SetXY($xPos + $cellWidth3 , $yPos);
-            $pdf->Ln(20);
-        }
-    }
-    
-    elseif ($pdf->GetStringWidth($row['jabatan']) > $cellWidth2) {
-
-        $textLength = strlen($row['jabatan']);
+        $pdf->Cell(17, $cellHeight,$row['nid'],1,0,'C');
         
-        while($startChar < $textLength) {
-            while ($pdf->GetStringWidth( $tmpString ) < ($cellWidth2-$errMargin) && ($startChar+$maxChar) < $textLength ) {
-                $maxChar++;
-                $tmpString=substr($row['jabatan'],$startChar,$maxChar);
-            }
-            
-            $startChar=$startChar+$maxChar;
-            array_push($textArray,$tmpString);
-            $maxChar=0;
-            $tmpString='';
-        }
-        
-        $line=count($textArray);
-
-        $pdf->Cell(8,($line * $cellHeight),$row['nomor'],1,0,'C');
-
-        if($pdf->GetStringWidth($row['nama']) > $cellWidth1) {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth1,$cellHeight,$row['nama'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth1 , $yPos);
-        }
-        else{
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth1,($line * $cellHeight),$row['nama'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth1 , $yPos);
-        }
-
-
-        $pdf->Cell(17,($line * $cellHeight),$row['nid'],1,0,'C');
-
         $xPos=$pdf->GetX();
         $yPos=$pdf->GetY();
         $pdf->MultiCell($cellWidth2,$cellHeight,$row['jabatan'],'TB','L');
         $pdf->SetXY($xPos + $cellWidth2 , $yPos);
-
-        $pdf->Cell(11,($line * $cellHeight),$row['unit'],1,0,'C');
-        $pdf->Cell(24,($line * $cellHeight),$row['grade'],'TB');
-        $pdf->Cell(17,($line * $cellHeight),$row['tgl_upgrade'],1,0,'C');
-        $pdf->Cell(16.5,($line * $cellHeight),$row['sasaran'],'TB',0,'C');
-        $pdf->Cell(16.5,($line * $cellHeight),$row['individu'],1,0,'C');
-
-        if($pdf->GetStringWidth($row['kriteria']) > $cellWidth3) {
-            
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth3,$cellHeight,$row['kriteria'],1,'C');
-            $pdf->SetXY($xPos + $cellWidth3 , $yPos);
-        }
-        else {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth3,($line * $cellHeight),$row['kriteria'],1,'C');
-            $pdf->SetXY($xPos + $cellWidth3 , $yPos);
-        }
-
-        $pdf->Ln(20);
-    }
     
-    elseif($pdf->GetStringWidth($row['kriteria']) > $cellWidth3) {
-        $textLength = strlen($row['kriteria']);
-        while($startChar < $textLength){
-            while ($pdf->GetStringWidth( $tmpString ) < ($cellWidth3-$errMargin) && ($startChar+$maxChar) < $textLength ) {
-                $maxChar++;
-                $tmpString=substr($row['kriteria'],$startChar,$maxChar);
-            }
-            $startChar=$startChar+$maxChar;
-            array_push($textArray,$tmpString);
-            $maxChar=0;
-            $tmpString='';
-        }
-        $line=count($textArray);
-
-        $pdf->Cell(8,($line * $cellHeight),$row['nomor'],1,0,'C');
-
-        if($pdf->GetStringWidth($row['nama']) > $cellWidth1) {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth1,$cellHeight,$row['nama'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth1 , $yPos);
-        }
-        else {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth1,($line * $cellHeight),$row['nama'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth1 , $yPos);
-        }       
-
-        $pdf->Cell(17,($line * $cellHeight),$row['nid'],1,0,'C');
-
-        if($pdf->GetStringWidth($row['jabatan']) > $cellWidth2) {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth2,$cellHeight,$row['jabatan'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth2 , $yPos);
-        }
-        else {
-            $xPos=$pdf->GetX();
-            $yPos=$pdf->GetY();
-            $pdf->MultiCell($cellWidth2,($line * $cellHeight),$row['jabatan'],'TB','L');
-            $pdf->SetXY($xPos + $cellWidth2 , $yPos);
-        }
-
-        $pdf->Cell(11,($line * $cellHeight),$row['unit'],1,0,'C');
-        $pdf->Cell(24,($line * $cellHeight),$row['grade'],'TB');
-        $pdf->Cell(17,($line * $cellHeight),$row['tgl_upgrade'],1,0,'C');
-        $pdf->Cell(16.5,($line * $cellHeight),$row['sasaran'],'TB',0,'C');
-        $pdf->Cell(16.5,($line * $cellHeight),$row['individu'],1,0,'C');
+        $pdf->Cell(11,$cellHeight,$row['unit'],1,0,'C');
+        $pdf->Cell(24,$cellHeight,$row['grade'],'TB');
+        $pdf->Cell(17,$cellHeight,$row['tgl_upgrade'],1,0,'C');
+        $pdf->Cell(16.5,$cellHeight,$row['sasaran'],'TB',0,'C');
+        $pdf->Cell(16.5,$cellHeight,$row['individu'],1,0,'C');
 
         $xPos=$pdf->GetX();
         $yPos=$pdf->GetY();
         $pdf->MultiCell($cellWidth3,$cellHeight,$row['kriteria'],1,'C');
         $pdf->SetXY($xPos + $cellWidth3 , $yPos);
-
         $pdf->Ln(20);
     }
-    
-    else {
-        $line=1;
-    }
-}
 $pdf->Output();
 ?>
