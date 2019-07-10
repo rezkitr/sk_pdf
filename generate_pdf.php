@@ -4,8 +4,9 @@ require('fpdf.php');
 
 class PDF extends FPDF {
 
+    // Header
     function Header () {
-        $this->Ln(10);
+        $this->Ln(7);
         $this->SetFont('Arial','',10);
         $this->Cell(80);
         $this->Cell(30,10,'PT. PEMBANGKITAN JAWA-BALI',0,0,'C');
@@ -36,11 +37,12 @@ class PDF extends FPDF {
         $this->SetFont('Arial','B',10);
         $this->Cell(80);
         $this->Cell(30,10,'DIREKSI PT. PEMBANGKITAN JAWA-BALI',0,0,'C');
-        $this->Ln(13);
+        $this->Ln(15);
     }
 
+    // Tubuh
     function Tubuh(){
-        $this->SetFont('Arial','',12);
+        $this->SetFont('Arial','',11);
         $this->Cell(22,10,'Menimbang',0,0,'L');
         $this->Cell(10,10,' :');
         $this->Cell(43);
@@ -63,28 +65,29 @@ class PDF extends FPDF {
         $this->Cell(22,10,'PERTAMA',0,0,'L');
         $this->Cell(10,10,' :');
 
-        $this->SetY(110.5);
-        $this->SetX(40);
+        $this->SetY(119.5);
+        $this->SetX(38);
         $teks = "Memberikan Kriteria Talenta Semester I Tahun 2018 kepada Karyawan PT Pembangkitan Jawa Bali, yang namanya tercantum pada lajur 2 daftar lampiran keputusan ini sebagaimana tercantum pada lajur 10 daftar lampiran yang sama.";
-        $this->MultiCell(150,5,$teks,0,'J');
+        $this->MultiCell(160,5,$teks,0,'J');
 
-        $this->Ln(3);
+        $this->SetY(133.4);
         $this->Cell(22,10,'KEDUA',0,0,'L');
         $this->Cell(10,10,' :');
 
-        $this->SetY(131.1);
-        $this->SetX(40);
+        $this->SetY(136);
+        $this->SetX(38);
         $teks = "Keputusan ini berlaku terhitung mulai tanggal 1 Januari 2018 sampai dengan 30 Juni 2018, dengan ketentuan apabila dikemudian hari ternyata terdapat kekeliruan dalam keputusan ini, akan ditinjau dan diperbaiki sebagaimana mestinya.";
-        $this->MultiCell(150,5,$teks,0,'J');
+        $this->MultiCell(160.5,5,$teks,0,'J');
 
         $this->Ln(5);
         $this->Cell(30);
         $this->Cell(30,5,'Ditetapkan di   : Surabaya');
 
-        $this->Ln();
+        $this->Ln(6);
         $this->Cell(30);
         $this->Cell(30,5,'Pada Tanggal  : 26 Desember 2018');
 
+        $this->SetFont('Arial','',10);
         $this->Ln(10);
         $this->Cell(30);
         $this->Cell(30,5,'DIREKTUR SDM DAN ADMINISTRASI,');
@@ -105,6 +108,7 @@ class PDF extends FPDF {
 
     }
 
+    // Header Tabel
     function TableHeader(){ 
         $this->SetFont('Arial','B',8);
         $this->Cell(8,20,'No', 'LTB',0,'C');
@@ -189,12 +193,13 @@ class PDF extends FPDF {
     
     }
 
+    // Footer
     function Footer () {
 
         $this->SetFont('Arial','',10);
         $this->SetY(-50);
         $this->Cell(20);
-        $this->Cell(30,10,'DIREKTUR SDM DAN ADMINISTRASI', 0,0,'C');
+        $this->Cell(30,10,'DIREKTUR SDM DAN ADMINISTRASI,', 0,0,'C');
 
         $this->SetY(-35);
         $this->Cell(30,10,'ttd', 0,0,'C');
@@ -224,45 +229,42 @@ class PDF extends FPDF {
         $this->Cell(85);
         $this->Cell(30,10,'FATCHUR ROZI', 0,0,'C');
 
-        $this->Image('img/stamp.png',110,245,40);
-        
+        $this->Image('img/stamp.png',110,245,40);   
     }
-
 }
 
 $pdf = new PDF();
 
-
 //DATABASE
-
 include ('koneksi.php');
 $karyawan = mysqli_query($connect, "select * from karyawan");
-
 $cellWidth1 = 27;
-    $cellWidth2 = 38;
-    $cellWidth3 = 17;
+$cellWidth2 = 38;
+$cellWidth3 = 17;
 
-    $cellHeight = 5;
-    $lineName = 1;
-    $lineJabatan = 1;
-    $lineKriteria = 1;
+$cellHeight = 5;
+$lineName = 1;
+$lineJabatan = 1;
+$lineKriteria = 1;
 
-    $errMargin = 5;
-    $startChar=0;		
-    $maxChar=0;			
+$errMargin = 5;
+$startChar=0;		
+$maxChar=0;			
     
-    $tmpString="";
+$tmpString="";
 
-    $line =1;
+$line =1;
 
 while ($row = mysqli_fetch_array($karyawan)) {
+    
     $pdf->AddPage();
-$pdf->Tubuh();
-$pdf->TableHeader();
+    $pdf->Tubuh();
+    $pdf->TableHeader();
     $pdf->SetFont('Arial','',7);
+    
     if(ceil($pdf->GetStringWidth($row['nama'])) >= $cellWidth1 ) {
-        $textArray=array();	
         
+        $textArray=array();	
         $textLength = strlen($row['nama']);
         
         while($startChar < $textLength){
@@ -276,18 +278,16 @@ $pdf->TableHeader();
             $maxChar=0;
             $tmpString='';
         }
-        // print_r($textArray);
+
         $lineName = count($textArray);
         if($cellHeight < ($lineName * 5)){
             $cellHeight = 5 * $lineName;
         }
         $startChar = 0;
-        
     }
     
-    
-    
     if($pdf->GetStringWidth($row['jabatan']) > $cellWidth2){
+        
         $textArray = array();
         $textLength = strlen($row['jabatan']);
         
@@ -302,8 +302,9 @@ $pdf->TableHeader();
             $maxChar=0;
             $tmpString='';
         }
+        
         $lineJabatan=count($textArray);
-        //print_r($textArray);
+
         if($cellHeight < ($lineJabatan* 5)){
             $cellHeight = 5 * $lineJabatan;
         }
@@ -311,6 +312,7 @@ $pdf->TableHeader();
     }
     
     if($pdf->GetStringWidth($row['kriteria']) > $cellWidth3){
+        
         $textArray=array();	
         $textLength = strlen($row['kriteria']);
         
@@ -325,47 +327,50 @@ $pdf->TableHeader();
             $tmpString='';
         }
         $lineKriteria=count($textArray);
+
         if($cellHeight < ($lineKriteria * 5)){
             $cellHeight = 5 *  $lineKriteria;
         }
         $startChar = 0;
     }
-
-        $pdf->Cell(8,$cellHeight,$row['nomor'],1,0,'C');
-
-        $xPos=$pdf->GetX();
-        $yPos=$pdf->GetY();
-        if($lineName >= 3){
-            $pdf->SetFont('Arial','',6);
-        }
-        $pdf->MultiCell($cellWidth1,($cellHeight/$lineName),$row['nama'],'TB','L');
-        $pdf->SetFont('Arial','',7);
-        $pdf->SetXY($xPos + $cellWidth1 , $yPos);
     
-        $pdf->Cell(17, $cellHeight,$row['nid'],1,0,'C');
-        
-        $xPos=$pdf->GetX();
-        $yPos=$pdf->GetY();
-        $pdf->MultiCell($cellWidth2,($cellHeight/$lineJabatan),$row['jabatan'],'TB','L');
-        $pdf->SetXY($xPos + $cellWidth2 , $yPos);
+    $pdf->Cell(8,$cellHeight,$row['nomor'],1,0,'C');
+
+    $xPos=$pdf->GetX();
+    $yPos=$pdf->GetY();
     
-        $pdf->Cell(11,$cellHeight,$row['unit'],1,0,'C');
-        $pdf->Cell(24,$cellHeight,$row['grade'],'TB',0,'C');
-        $pdf->Cell(17,$cellHeight,$row['tgl_upgrade'],1,0,'C');
-        $pdf->Cell(16.5,$cellHeight,$row['sasaran'],'TB',0,'C');
-        $pdf->Cell(16.5,$cellHeight,$row['individu'],1,0,'C');
-
-        $xPos=$pdf->GetX();
-        $yPos=$pdf->GetY();
-        $pdf->MultiCell($cellWidth3,($cellHeight/$lineKriteria),$row['kriteria'],1,'C');
-        $pdf->SetXY($xPos + $cellWidth3 , $yPos);
-        $pdf->Ln(20);
-
-        $lineName = 1;
-        $lineJabatan = 1;
-        $lineKriteria = 1;
-        $cellHeight = 5;
+    if($lineName >= 3){
+        $pdf->SetFont('Arial','',6);
     }
+        
+    $pdf->MultiCell($cellWidth1,($cellHeight/$lineName),$row['nama'],'TB','L');
+    $pdf->SetFont('Arial','',7);
+    $pdf->SetXY($xPos + $cellWidth1 , $yPos);
+    
+    $pdf->Cell(17, $cellHeight,$row['nid'],1,0,'C');
+        
+    $xPos=$pdf->GetX();
+    $yPos=$pdf->GetY();
+    $pdf->MultiCell($cellWidth2,($cellHeight/$lineJabatan),$row['jabatan'],'TB','L');
+    $pdf->SetXY($xPos + $cellWidth2 , $yPos);
+    
+    $pdf->Cell(11,$cellHeight,$row['unit'],1,0,'C');
+    $pdf->Cell(24,$cellHeight,$row['grade'],'TB',0,'C');
+    $pdf->Cell(17,$cellHeight,$row['tgl_upgrade'],1,0,'C');
+    $pdf->Cell(16.5,$cellHeight,$row['sasaran'],'TB',0,'C');
+    $pdf->Cell(16.5,$cellHeight,$row['individu'],1,0,'C');
+
+    $xPos=$pdf->GetX();
+    $yPos=$pdf->GetY();
+    $pdf->MultiCell($cellWidth3,($cellHeight/$lineKriteria),$row['kriteria'],1,'C');
+    $pdf->SetXY($xPos + $cellWidth3 , $yPos);
+    $pdf->Ln(20);
+
+    $lineName = 1;
+    $lineJabatan = 1;
+    $lineKriteria = 1;
+    $cellHeight = 5;
+}
 
 $pdf->Output();
 ?>
