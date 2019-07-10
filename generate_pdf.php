@@ -386,6 +386,40 @@ if ($zip->open($filename, ZipArchive::CREATE) === true) {
         $zip->addFile($SK['tahun'] . '_' . $row['nid'] . '_' . $SK['semester'] . '.pdf');
         $i++;
     }
+        
+    $pdf->MultiCell($cellWidth1,($cellHeight/$lineName),$row['nama'],'TB','L');
+    $pdf->SetFont('Arial','',7);
+    $pdf->SetXY($xPos + $cellWidth1 , $yPos);
+    
+    $pdf->Cell(17, $cellHeight,$row['nid'],1,0,'C');
+        
+    $xPos=$pdf->GetX();
+    $yPos=$pdf->GetY();
+    $pdf->MultiCell($cellWidth2,($cellHeight/$lineJabatan),$row['jabatan'],'TB','L');
+    $pdf->SetXY($xPos + $cellWidth2 , $yPos);
+    
+    $pdf->Cell(11,$cellHeight,$row['unit'],1,0,'C');
+    $pdf->Cell(24,$cellHeight,$row['grade'],'TB',0,'C');
+    $pdf->Cell(17,$cellHeight,$row['tgl_upgrade'],1,0,'C');
+    $pdf->Cell(16.5,$cellHeight,$row['sasaran'],'TB',0,'C');
+    $pdf->Cell(16.5,$cellHeight,$row['individu'],1,0,'C');
+
+    $xPos=$pdf->GetX();
+    $yPos=$pdf->GetY();
+    $pdf->MultiCell($cellWidth3,($cellHeight/$lineKriteria),$row['kriteria'],1,'C');
+    $pdf->SetXY($xPos + $cellWidth3 , $yPos);
+    $pdf->Ln(20);
+
+    $lineName = 1;
+    $lineJabatan = 1;
+    $lineKriteria = 1;
+    $cellHeight = 5;
+    $dir = $SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf';
+    $pdf->Output('F',$dir);
+    $zip->addFile($SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf');
+    $i++;
+}
+// $zip->close();
 }
 header("Pragma: public");
 header("Expires: 0");
