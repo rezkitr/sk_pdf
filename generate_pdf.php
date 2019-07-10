@@ -105,7 +105,7 @@ class PDF extends FPDF {
 
         $this->Ln(10);
         $this->Cell(30);
-        $this->Cell(30,5,$arr['dir_sdm']);
+        $this->Cell(30,5,$arr['kadiv_pmc']);
 
         $this->SetFont('Arial','',8);
         $this->Ln();
@@ -241,7 +241,7 @@ class PDF extends FPDF {
     }
 }
 
-$pdf = new PDF();
+
 
 $cellWidth1 = 27;
 $cellWidth2 = 38;
@@ -261,11 +261,14 @@ $tmpString="";
 $line =1;
 $count;
 $row = array();
-$zip = new ZipArchive;
-if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
-{
+$i = 0;
 
+$zip = new ZipArchive;
+$filename = $SK['judul'].$SK['tahun'].'.zip';
+if ($zip->open($filename, ZipArchive::CREATE) === TRUE)
+{
 while ($row = mysqli_fetch_assoc($karyawan)) {
+    $pdf = new PDF();
     $pdf->AddPage();
     $pdf->Tubuh($SK);
     $pdf->TableHeader();
@@ -379,15 +382,24 @@ while ($row = mysqli_fetch_assoc($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
-    $i = 0;
-    $zip->addFromString('new.pdf', $pdf->Output( 'Coba'.$i.'.pdf', 'S')); 
+    $dir = $SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf';
+    $pdf->Output('F','/files/'.$dir);
+    $zip->addFile($SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf');
+    $i++;
 }
 $zip->close();
 }
-header('Content-type: application/zip');
-header('Content-Disposition: attachment; filename="my-pdf.zip"');
-readfile('my-pdf.zip');
-
+header("Pragma: public");
+header("Expires: 0");
+header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("Cache-Control: public");
+header("Content-Description: File Transfer");
+header("Content-type: application/octet-stream");
+header("Content-Disposition: attachment; filename=\"".$filename."\"");
+header("Content-Transfer-Encoding: binary");
+header("Content-Length: ".filesize($filename));
+ob_end_flush();
+@readfile($filename);
 //$pdf->output("F");
 
 ?>
