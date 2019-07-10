@@ -6,7 +6,6 @@ require('fpdf.php');
 include ('koneksi.php');
 $karyawan = mysqli_query($connect, "select * from karyawan");
 $SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
-// print_r ($SK);
 
 class PDF extends FPDF {
 
@@ -105,7 +104,7 @@ class PDF extends FPDF {
 
         $this->Ln(10);
         $this->Cell(30);
-        $this->Cell(30,5,$arr['kadiv_pmc']);
+        $this->Cell(30,5,$arr['dir_sdm']);
 
         $this->SetFont('Arial','',8);
         $this->Ln();
@@ -260,7 +259,11 @@ $tmpString="";
 
 $line =1;
 
+$counter = 0;
+
 while ($row = mysqli_fetch_array($karyawan)) {
+
+    $counter++;
     
     $pdf->AddPage();
     $pdf->Tubuh($SK);
@@ -375,10 +378,10 @@ while ($row = mysqli_fetch_array($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
-
+    
     $pdf->Output('D', 'Coba.pdf');
 }
 
-$pdf->output();
+
 
 ?>
