@@ -385,7 +385,7 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
         $dir = $SK['tahun'] . '_' . $row['nid'] . '_' . $SK['semester'] . '.pdf';
         $pdf->Output('F', $dir);
         $zip->addFile($dir);
-
+        unlink($dir);
         $i++;
     }
 }
