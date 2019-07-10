@@ -265,7 +265,7 @@ $i = 0;
 
 $zip = new ZipArchive;
 $filename = $SK['judul'] . $SK['tahun'] . '.zip';
-if ($zip->open($filename, ZipArchive::CREATE) === true) {
+if ($zip->open($filename, ZipArchive::OVERWRITE)) {
     while ($row = mysqli_fetch_assoc($karyawan)) {
         $pdf = new PDF();
         $pdf->AddPage();
@@ -383,17 +383,22 @@ if ($zip->open($filename, ZipArchive::CREATE) === true) {
         $cellHeight = 5;
         $dir = $SK['tahun'] . '_' . $row['nid'] . '_' . $SK['semester'] . '.pdf';
         $pdf->Output('F', $dir);
-        $zip->addFile($SK['tahun'] . '_' . $row['nid'] . '_' . $SK['semester'] . '.pdf');
+        $zip->addFile($dir);
+
         $i++;
     }
 // $zip->close();
 }
-header("Pragma: public");
+// while (ob_get_level() > 0) {
+//     ob_end_clean();
+// }
+// if (file_exists($filename)) {
+//     unlink($filename);
+// }
+header("Pragma: no-cache");
 header("Expires: 0");
-header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-header("Cache-Control: public");
 header("Content-Description: File Transfer");
-header("Content-type: application/octet-stream");
+header("Content-type: application/zip");
 header("Content-Disposition: attachment; filename=\"" . $filename . "\"");
 header("Content-Transfer-Encoding: binary");
 header("Content-Length: " . filesize($filename));
