@@ -5,8 +5,7 @@ require('fpdf.php');
 //DATABASE
 include ('koneksi.php');
 $karyawan = mysqli_query($connect, "select * from karyawan");
-$SK = mysqli_fetch_assoc(mysqli_query($connect, "select * from surat_keputusan"));
-// print_r ($SK);
+$SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
 
 class PDF extends FPDF {
 
@@ -387,7 +386,7 @@ while ($row = mysqli_fetch_assoc($karyawan)) {
     $zip->addFile($SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf');
     $i++;
 }
-$zip->close();
+// $zip->close();
 }
 header("Pragma: public");
 header("Expires: 0");
