@@ -105,7 +105,7 @@ class PDF extends FPDF {
 
         $this->Ln(10);
         $this->Cell(30);
-        $this->Cell(30,5,$arr['kadiv_pmc']);
+        $this->Cell(30,5,$arr['dir_sdm']);
 
         $this->SetFont('Arial','',8);
         $this->Ln();
