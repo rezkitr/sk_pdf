@@ -4,7 +4,7 @@ require 'fpdf.php';
 
 //DATABASE
 include 'koneksi.php';
-$karyawan = mysqli_query($connect, "select * from karyawan");
+$karyawan = mysqli_query($connect, "select * from karyawan where nomor = 3");
 $SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
 
 class PDF extends FPDF
