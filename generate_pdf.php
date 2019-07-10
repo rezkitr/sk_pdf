@@ -370,7 +370,9 @@ while ($row = mysqli_fetch_array($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
+
+    $pdf->Output('D', 'Coba.pdf');
 }
 
-$pdf->Output();
+
 ?>
