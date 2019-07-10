@@ -200,7 +200,6 @@ class PDF extends FPDF
         $this->Cell(17, 5, '10', 'R', 0, 'C');
 
         $this->Ln();
-
     }
 
     // Footer
