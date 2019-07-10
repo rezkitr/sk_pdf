@@ -5,8 +5,7 @@ require('fpdf.php');
 //DATABASE
 include ('koneksi.php');
 $karyawan = mysqli_query($connect, "select * from karyawan");
-$SK = mysqli_fetch_assoc(mysqli_query($connect, "select * from surat_keputusan"));
-// print_r ($SK);
+$SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
 
 class PDF extends FPDF {
 
@@ -259,9 +258,13 @@ $maxChar=0;
 $tmpString="";
 
 $line =1;
-$count;
-$row = array();
-while ($row = mysqli_fetch_assoc($karyawan)) {
+
+$counter = 0;
+
+while ($row = mysqli_fetch_array($karyawan)) {
+
+    $counter++;
+    
     $pdf->AddPage();
     $pdf->Tubuh($SK);
     $pdf->TableHeader();
@@ -375,26 +378,10 @@ while ($row = mysqli_fetch_assoc($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
-
-    //$pdf->Output('D', 'Coba.pdf');
+    
+    if ($counter >)
+    $pdf->Output('D', 'Coba.pdf');
+  
 }
-$zip = new ZipArchive;
-if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
-{
-    // Add files to the zip file
-    $zip->addFile('test.txt');
-    $zip->addFile('test.pdf');
- 
-    // Add random.txt file to zip and rename it to newfile.txt
-    $zip->addFile('random.txt', 'newfile.txt');
- 
-    // Add a file new.txt file to zip using the text specified
-    $zip->addFromString('new.txt', 'text to be added to the new.txt file');
- 
-    // All files are added, so close the zip file.
-    $zip->close();
-}
-
-$pdf->output("F");
 
 ?>
