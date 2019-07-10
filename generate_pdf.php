@@ -382,7 +382,7 @@ while ($row = mysqli_fetch_assoc($karyawan)) {
     $lineKriteria = 1;
     $cellHeight = 5;
     $dir = $SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf';
-    $pdf->Output('F','/files/'.$dir);
+    $pdf->Output('F',$dir);
     $zip->addFile($SK['tahun'].'_'.$row['nid'].'_'.$SK['semester'].'.pdf');
     $i++;
 }
