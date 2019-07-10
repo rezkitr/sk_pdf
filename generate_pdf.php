@@ -261,6 +261,10 @@ $tmpString="";
 $line =1;
 $count;
 $row = array();
+$zip = new ZipArchive;
+if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
+{
+
 while ($row = mysqli_fetch_assoc($karyawan)) {
     $pdf->AddPage();
     $pdf->Tubuh($SK);
@@ -375,26 +379,15 @@ while ($row = mysqli_fetch_assoc($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
-
-    //$pdf->Output('D', 'Coba.pdf');
+    $i = 0;
+    $zip->addFromString('new.pdf', $pdf->Output( 'Coba'.$i.'.pdf', 'S')); 
 }
-$zip = new ZipArchive;
-if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
-{
-    // Add files to the zip file
-    $zip->addFile('test.txt');
-    $zip->addFile('test.pdf');
- 
-    // Add random.txt file to zip and rename it to newfile.txt
-    $zip->addFile('random.txt', 'newfile.txt');
- 
-    // Add a file new.txt file to zip using the text specified
-    $zip->addFromString('new.txt', 'text to be added to the new.txt file');
- 
-    // All files are added, so close the zip file.
-    $zip->close();
+$zip->close();
 }
+header('Content-type: application/zip');
+header('Content-Disposition: attachment; filename="my-pdf.zip"');
+readfile('my-pdf.zip');
 
-$pdf->output("F");
+//$pdf->output("F");
 
 ?>
