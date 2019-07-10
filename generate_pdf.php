@@ -2,10 +2,17 @@
 
 require('fpdf.php');
 
+//DATABASE
+include ('koneksi.php');
+$karyawan = mysqli_query($connect, "select * from karyawan");
+$SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
+// print_r ($SK);
+
 class PDF extends FPDF {
 
     // Header
     function Header () {
+        global $SK;
         $this->Ln(7);
         $this->SetFont('Arial','',10);
         $this->Cell(80);
@@ -23,7 +30,7 @@ class PDF extends FPDF {
         $this->Ln(8);
 
         $this->Cell(80);
-        $this->Cell(30,10,'Nomor : P.045/010/PJB/2018',0,0,'C');
+        $this->Cell(30,10,'Nomor : '. $SK['nomor'],0,0,'C');
         $this->Ln(8);
 
         $this->Cell(80);
@@ -31,7 +38,7 @@ class PDF extends FPDF {
         $this->Ln(8);
 
         $this->Cell(80);
-        $this->Cell(30,10,'PENETAPAN KRITERIA TALENTA KARYAWAN PT. PJB',0,0,'C');
+        $this->Cell(30,10, $SK['judul'],0,0,'C');
         $this->Ln(8);
 
         $this->SetFont('Arial','B',10);
@@ -41,7 +48,7 @@ class PDF extends FPDF {
     }
 
     // Tubuh
-    function Tubuh(){
+    function Tubuh($arr){
         $this->SetFont('Arial','',11);
         $this->Cell(22,10,'Menimbang',0,0,'L');
         $this->Cell(10,10,' :');
@@ -67,7 +74,7 @@ class PDF extends FPDF {
 
         $this->SetY(119.5);
         $this->SetX(38);
-        $teks = "Memberikan Kriteria Talenta Semester I Tahun 2018 kepada Karyawan PT Pembangkitan Jawa Bali, yang namanya tercantum pada lajur 2 daftar lampiran keputusan ini sebagaimana tercantum pada lajur 10 daftar lampiran yang sama.";
+        $teks = "Memberikan Kriteria Talenta Semester ".$arr['semester']." Tahun ".$arr['tahun']." kepada Karyawan PT Pembangkitan Jawa Bali, yang namanya tercantum pada lajur 2 daftar lampiran keputusan ini sebagaimana tercantum pada lajur 10 daftar lampiran yang sama.";
         $this->MultiCell(160,5,$teks,0,'J');
 
         $this->SetY(133.4);
@@ -76,16 +83,16 @@ class PDF extends FPDF {
 
         $this->SetY(136);
         $this->SetX(38);
-        $teks = "Keputusan ini berlaku terhitung mulai tanggal 1 Januari 2018 sampai dengan 30 Juni 2018, dengan ketentuan apabila dikemudian hari ternyata terdapat kekeliruan dalam keputusan ini, akan ditinjau dan diperbaiki sebagaimana mestinya.";
+        $teks = "Keputusan ini berlaku terhitung mulai tanggal ".$arr['tgl_berlaku']." sampai dengan ".$arr['tgl_berakhir'].", dengan ketentuan apabila dikemudian hari ternyata terdapat kekeliruan dalam keputusan ini, akan ditinjau dan diperbaiki sebagaimana mestinya.";
         $this->MultiCell(160.5,5,$teks,0,'J');
 
         $this->Ln(5);
         $this->Cell(30);
-        $this->Cell(30,5,'Ditetapkan di   : Surabaya');
+        $this->Cell(30,5,'Ditetapkan di   : '.$arr['tempat']);
 
         $this->Ln(6);
         $this->Cell(30);
-        $this->Cell(30,5,'Pada Tanggal  : 26 Desember 2018');
+        $this->Cell(30,5,'Pada Tanggal  : '.$arr['tgl_penetapan']);
 
         $this->SetFont('Arial','',10);
         $this->Ln(10);
@@ -98,7 +105,7 @@ class PDF extends FPDF {
 
         $this->Ln(10);
         $this->Cell(30);
-        $this->Cell(30,5,'SUHARTO');
+        $this->Cell(30,5,$arr['kadiv_pmc']);
 
         $this->SetFont('Arial','',8);
         $this->Ln();
@@ -195,6 +202,7 @@ class PDF extends FPDF {
 
     // Footer
     function Footer () {
+        global $SK;
 
         $this->SetFont('Arial','',10);
         $this->SetY(-50);
@@ -207,7 +215,7 @@ class PDF extends FPDF {
 
         $this->SetY(-20);
         $this->SetX(8);
-        $this->Cell(30,10,'SUHARTO', 0,0,'C');
+        $this->Cell(30,10, $SK['dir_sdm'], 0,0,'C');
 
         $this->SetY(-55);
         $this->SetX(31.5);
@@ -227,7 +235,7 @@ class PDF extends FPDF {
         $this->SetY(-20);
         $this->SetX(34);
         $this->Cell(85);
-        $this->Cell(30,10,'FATCHUR ROZI', 0,0,'C');
+        $this->Cell(30,10, $SK['kadiv_pmc'], 0,0,'C');
 
         $this->Image('img/stamp.png',110,245,40);   
     }
@@ -235,9 +243,6 @@ class PDF extends FPDF {
 
 $pdf = new PDF();
 
-//DATABASE
-include ('koneksi.php');
-$karyawan = mysqli_query($connect, "select * from karyawan");
 $cellWidth1 = 27;
 $cellWidth2 = 38;
 $cellWidth3 = 17;
@@ -258,7 +263,7 @@ $line =1;
 while ($row = mysqli_fetch_array($karyawan)) {
     
     $pdf->AddPage();
-    $pdf->Tubuh();
+    $pdf->Tubuh($SK);
     $pdf->TableHeader();
     $pdf->SetFont('Arial','',7);
     
@@ -371,5 +376,7 @@ while ($row = mysqli_fetch_array($karyawan)) {
     $lineKriteria = 1;
     $cellHeight = 5;
 }
+
+$pdf->output();
 
 ?>
