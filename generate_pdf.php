@@ -239,9 +239,7 @@ class PDF extends FPDF {
         $this->Image('img/stamp.png',110,245,40);   
     }
 }
-
 $pdf = new PDF();
-
 $cellWidth1 = 27;
 $cellWidth2 = 38;
 $cellWidth3 = 17;
@@ -260,11 +258,12 @@ $tmpString="";
 $line =1;
 $count;
 $row = array();
-$zip = new ZipArchive;
-if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
+// $zip = new ZipArchive;
+// if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
 {
 
 while ($row = mysqli_fetch_assoc($karyawan)) {
+
     $pdf->AddPage();
     $pdf->Tubuh($SK);
     $pdf->TableHeader();
@@ -378,15 +377,16 @@ while ($row = mysqli_fetch_assoc($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
-    $i = 0;
-    $zip->addFromString('new.pdf', $pdf->Output( 'Coba'.$i.'.pdf', 'S')); 
-}
-$zip->close();
-}
-header('Content-type: application/zip');
-header('Content-Disposition: attachment; filename="my-pdf.zip"');
-readfile('my-pdf.zip');
 
-//$pdf->output("F");
+    // $i = 0;
+    // $zip->addFromString('new.pdf', $pdf->Output( 'Coba'.$i.'.pdf', 'S')); 
+}
+// $zip->close();
+}
+// header('Content-type: application/zip');
+// header('Content-Disposition: attachment; filename="my-pdf.zip"');
+// readfile('my-pdf.zip');
+
+$pdf->output();
 
 ?>
