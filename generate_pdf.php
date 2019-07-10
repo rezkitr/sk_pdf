@@ -258,13 +258,13 @@ $maxChar=0;
 $tmpString="";
 
 $line =1;
+$count;
+$row = array();
+$zip = new ZipArchive;
+if ($zip->open('test_new.zip', ZipArchive::CREATE) === TRUE)
+{
 
-$counter = 0;
-
-while ($row = mysqli_fetch_array($karyawan)) {
-
-    $counter++;
-    
+while ($row = mysqli_fetch_assoc($karyawan)) {
     $pdf->AddPage();
     $pdf->Tubuh($SK);
     $pdf->TableHeader();
@@ -378,10 +378,15 @@ while ($row = mysqli_fetch_array($karyawan)) {
     $lineJabatan = 1;
     $lineKriteria = 1;
     $cellHeight = 5;
-    
-    if ($counter >)
-    $pdf->Output('D', 'Coba.pdf');
-  
+    $i = 0;
+    $zip->addFromString('new.pdf', $pdf->Output( 'Coba'.$i.'.pdf', 'S')); 
 }
+$zip->close();
+}
+header('Content-type: application/zip');
+header('Content-Disposition: attachment; filename="my-pdf.zip"');
+readfile('my-pdf.zip');
+
+//$pdf->output("F");
 
 ?>
