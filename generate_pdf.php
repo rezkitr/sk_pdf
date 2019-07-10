@@ -200,6 +200,7 @@ class PDF extends FPDF
         $this->Cell(17, 5, '10', 'R', 0, 'C');
 
         $this->Ln();
+
     }
 
     // Footer
@@ -387,7 +388,6 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
 
         $i++;
     }
-// $zip->close();
 }
 // while (ob_get_level() > 0) {
 //     ob_end_clean();
@@ -404,4 +404,3 @@ header("Content-Transfer-Encoding: binary");
 header("Content-Length: " . filesize($filename));
 ob_end_flush();
 @readfile($filename);
-//$pdf->output("F");
