@@ -262,7 +262,7 @@ $tmpString = "";
 $line = 1;
 $count;
 $row = array();
-$i = 0;
+
 
 $zip = new ZipArchive;
 $filename = $SK['judul'] . $SK['tahun'] . '.zip';
@@ -386,8 +386,8 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
         $pdf->Output('F', $dir);
         $zip->addFile($dir);
         unlink($dir);
-        $i++;
     }
+    $zip->close();
 }
 // while (ob_get_level() > 0) {
 //     ob_end_clean();
