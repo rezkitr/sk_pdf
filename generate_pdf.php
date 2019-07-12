@@ -4,7 +4,7 @@ require 'fpdf.php';
 
 //DATABASE
 include 'koneksi.php';
-$karyawan = mysqli_query($connect, "select * from karyawan where nomor = 1");
+$karyawan = mysqli_query($connect, "select * from karyawan where nomor");
 $SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
 
 class PDF extends FPDF
@@ -264,150 +264,148 @@ $count;
 $row = array();
 
 $attachmentFiles = array();
-$toBeUnlinked = array ();
+$toBeUnlinked = array();
 
 $zip = new ZipArchive;
 $filename = $SK['judul'] . $SK['tahun'] . '.zip';
 if ($zip->open($filename, ZipArchive::OVERWRITE) !== true) {
     $zip->open($filename, ZipArchive::CREATE);
 }
-    while ($row = mysqli_fetch_assoc($karyawan)) {
-        $pdf = new PDF();
-        $pdf->AddPage();
-        $pdf->Tubuh($SK, $row);
-        $pdf->TableHeader();
-        $pdf->SetFont('Arial', '', 7);
+while ($row = mysqli_fetch_assoc($karyawan)) {
+    $pdf = new PDF();
+    $pdf->AddPage();
+    $pdf->Tubuh($SK, $row);
+    $pdf->TableHeader();
+    $pdf->SetFont('Arial', '', 7);
 
-        if (ceil($pdf->GetStringWidth($row['nama'])) >= $cellWidth1) {
+    if (ceil($pdf->GetStringWidth($row['nama'])) >= $cellWidth1) {
 
-            $textArray = array();
-            $textLength = strlen($row['nama']);
+        $textArray = array();
+        $textLength = strlen($row['nama']);
 
-            while ($startChar < $textLength) {
-                while ($pdf->GetStringWidth($tmpString) < ($cellWidth1 - $errMargin) && ($startChar + $maxChar) < $textLength) {
-                    $maxChar++;
-                    $tmpString = substr($row['nama'], $startChar, $maxChar);
-                }
-
-                $startChar = $startChar + $maxChar;
-                array_push($textArray, $tmpString);
-                $maxChar = 0;
-                $tmpString = '';
+        while ($startChar < $textLength) {
+            while ($pdf->GetStringWidth($tmpString) < ($cellWidth1 - $errMargin) && ($startChar + $maxChar) < $textLength) {
+                $maxChar++;
+                $tmpString = substr($row['nama'], $startChar, $maxChar);
             }
 
-            $lineName = count($textArray);
-            if ($cellHeight < ($lineName * 5)) {
-                $cellHeight = 5 * $lineName;
-            }
-            $startChar = 0;
+            $startChar = $startChar + $maxChar;
+            array_push($textArray, $tmpString);
+            $maxChar = 0;
+            $tmpString = '';
         }
 
-        if ($pdf->GetStringWidth($row['jabatan']) > $cellWidth2) {
-
-            $textArray = array();
-            $textLength = strlen($row['jabatan']);
-
-            while ($startChar < $textLength) {
-                while ($pdf->GetStringWidth($tmpString) < ($cellWidth2 - $errMargin) && ($startChar + $maxChar) < $textLength) {
-                    $maxChar++;
-                    $tmpString = substr($row['jabatan'], $startChar, $maxChar);
-                }
-
-                $startChar = $startChar + $maxChar;
-                array_push($textArray, $tmpString);
-                $maxChar = 0;
-                $tmpString = '';
-            }
-
-            $lineJabatan = count($textArray);
-
-            if ($cellHeight < ($lineJabatan * 5)) {
-                $cellHeight = 5 * $lineJabatan;
-            }
-            $startChar = 0;
+        $lineName = count($textArray);
+        if ($cellHeight < ($lineName * 5)) {
+            $cellHeight = 5 * $lineName;
         }
-
-        if ($pdf->GetStringWidth($row['kriteria']) > $cellWidth3) {
-
-            $textArray = array();
-            $textLength = strlen($row['kriteria']);
-
-            while ($startChar < $textLength) {
-                while ($pdf->GetStringWidth($tmpString) < ($cellWidth3 - $errMargin) && ($startChar + $maxChar) < $textLength) {
-                    $maxChar++;
-                    $tmpString = substr($row['kriteria'], $startChar, $maxChar);
-                }
-                $startChar = $startChar + $maxChar;
-                array_push($textArray, $tmpString);
-                $maxChar = 0;
-                $tmpString = '';
-            }
-            $lineKriteria = count($textArray);
-
-            if ($cellHeight < ($lineKriteria * 5)) {
-                $cellHeight = 5 * $lineKriteria;
-            }
-            $startChar = 0;
-        }
-
-        $pdf->Cell(8, $cellHeight, $row['nomor'], 1, 0, 'C');
-
-        $xPos = $pdf->GetX();
-        $yPos = $pdf->GetY();
-
-        if ($lineName >= 3) {
-            $pdf->SetFont('Arial', '', 6);
-        }
-
-        $pdf->MultiCell($cellWidth1, ($cellHeight / $lineName), $row['nama'], 'TB', 'L');
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->SetXY($xPos + $cellWidth1, $yPos);
-
-        $pdf->Cell(17, $cellHeight, $row['nid'], 1, 0, 'C');
-
-        $xPos = $pdf->GetX();
-        $yPos = $pdf->GetY();
-        $pdf->MultiCell($cellWidth2, ($cellHeight / $lineJabatan), $row['jabatan'], 'TB', 'L');
-        $pdf->SetXY($xPos + $cellWidth2, $yPos);
-
-        $pdf->Cell(11, $cellHeight, $row['unit'], 1, 0, 'C');
-        $pdf->Cell(24, $cellHeight, $row['grade'], 'TB', 0, 'C');
-        $pdf->Cell(17, $cellHeight, $row['tgl_upgrade'], 1, 0, 'C');
-        $pdf->Cell(16.5, $cellHeight, $row['sasaran'], 'TB', 0, 'C');
-        $pdf->Cell(16.5, $cellHeight, $row['individu'], 1, 0, 'C');
-
-        $xPos = $pdf->GetX();
-        $yPos = $pdf->GetY();
-        $pdf->MultiCell($cellWidth3, ($cellHeight / $lineKriteria), $row['kriteria'], 1, 'C');
-        $pdf->SetXY($xPos + $cellWidth3, $yPos);
-        $pdf->Ln(20);
-
-        $lineName = 1;
-        $lineJabatan = 1;
-        $lineKriteria = 1;
-        $cellHeight = 5;
-
-        $dir = $row['nid'] . '_PENILAIAN_' . $SK['tahun'] . '_SEMESTER_' . $SK['semester'] . '.pdf';
-        $pdf->Output('F', $dir);
-        $attachmentFiles[] = $dir;
-        $toBeUnlinked[] = $dir;
+        $startChar = 0;
     }
 
-    if(count($attachmentFiles) > 1) {
-        foreach ($attachmentFiles as $file) {
-            $zip->addFile($file);
+    if ($pdf->GetStringWidth($row['jabatan']) > $cellWidth2) {
+
+        $textArray = array();
+        $textLength = strlen($row['jabatan']);
+
+        while ($startChar < $textLength) {
+            while ($pdf->GetStringWidth($tmpString) < ($cellWidth2 - $errMargin) && ($startChar + $maxChar) < $textLength) {
+                $maxChar++;
+                $tmpString = substr($row['jabatan'], $startChar, $maxChar);
+            }
+
+            $startChar = $startChar + $maxChar;
+            array_push($textArray, $tmpString);
+            $maxChar = 0;
+            $tmpString = '';
         }
-        $zip->close($filename);
-    }
-    else {
-        foreach ($attachmentFiles as $file) {
-            $pdf->Output('D', $file);
+
+        $lineJabatan = count($textArray);
+
+        if ($cellHeight < ($lineJabatan * 5)) {
+            $cellHeight = 5 * $lineJabatan;
         }
-    }
-    foreach($toBeUnlinked as $file) {
-        unlink($file);
+        $startChar = 0;
     }
 
+    if ($pdf->GetStringWidth($row['kriteria']) > $cellWidth3) {
+
+        $textArray = array();
+        $textLength = strlen($row['kriteria']);
+
+        while ($startChar < $textLength) {
+            while ($pdf->GetStringWidth($tmpString) < ($cellWidth3 - $errMargin) && ($startChar + $maxChar) < $textLength) {
+                $maxChar++;
+                $tmpString = substr($row['kriteria'], $startChar, $maxChar);
+            }
+            $startChar = $startChar + $maxChar;
+            array_push($textArray, $tmpString);
+            $maxChar = 0;
+            $tmpString = '';
+        }
+        $lineKriteria = count($textArray);
+
+        if ($cellHeight < ($lineKriteria * 5)) {
+            $cellHeight = 5 * $lineKriteria;
+        }
+        $startChar = 0;
+    }
+
+    $pdf->Cell(8, $cellHeight, $row['nomor'], 1, 0, 'C');
+
+    $xPos = $pdf->GetX();
+    $yPos = $pdf->GetY();
+
+    if ($lineName >= 3) {
+        $pdf->SetFont('Arial', '', 6);
+    }
+
+    $pdf->MultiCell($cellWidth1, ($cellHeight / $lineName), $row['nama'], 'TB', 'L');
+    $pdf->SetFont('Arial', '', 7);
+    $pdf->SetXY($xPos + $cellWidth1, $yPos);
+
+    $pdf->Cell(17, $cellHeight, $row['nid'], 1, 0, 'C');
+
+    $xPos = $pdf->GetX();
+    $yPos = $pdf->GetY();
+    $pdf->MultiCell($cellWidth2, ($cellHeight / $lineJabatan), $row['jabatan'], 'TB', 'L');
+    $pdf->SetXY($xPos + $cellWidth2, $yPos);
+
+    $pdf->Cell(11, $cellHeight, $row['unit'], 1, 0, 'C');
+    $pdf->Cell(24, $cellHeight, $row['grade'], 'TB', 0, 'C');
+    $pdf->Cell(17, $cellHeight, $row['tgl_upgrade'], 1, 0, 'C');
+    $pdf->Cell(16.5, $cellHeight, $row['sasaran'], 'TB', 0, 'C');
+    $pdf->Cell(16.5, $cellHeight, $row['individu'], 1, 0, 'C');
+
+    $xPos = $pdf->GetX();
+    $yPos = $pdf->GetY();
+    $pdf->MultiCell($cellWidth3, ($cellHeight / $lineKriteria), $row['kriteria'], 1, 'C');
+    $pdf->SetXY($xPos + $cellWidth3, $yPos);
+    $pdf->Ln(20);
+
+    $lineName = 1;
+    $lineJabatan = 1;
+    $lineKriteria = 1;
+    $cellHeight = 5;
+
+    $dir = $row['nid'] . '_PENILAIAN_' . $SK['tahun'] . '_SEMESTER_' . $SK['semester'] . '.pdf';
+    $pdf->Output('F', $dir);
+    $attachmentFiles[] = $dir;
+    $toBeUnlinked[] = $dir;
+}
+
+if (count($attachmentFiles) > 1) {
+    foreach ($attachmentFiles as $file) {
+        $zip->addFile($file);
+    }
+    $zip->close($filename);
+} else {
+    foreach ($attachmentFiles as $file) {
+        $pdf->Output('D', $file);
+    }
+}
+foreach ($toBeUnlinked as $file) {
+    unlink($file);
+}
 
 header("Pragma: no-cache");
 header("Expires: 0");
