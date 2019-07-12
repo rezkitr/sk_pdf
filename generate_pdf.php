@@ -420,3 +420,4 @@ header("Content-Transfer-Encoding: binary");
 header("Content-Length: " . filesize($filename));
 ob_end_flush();
 @readfile($filename);
+unlink($filename);
