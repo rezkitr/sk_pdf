@@ -4,8 +4,10 @@ require 'fpdf.php';
 
 //DATABASE
 include 'koneksi.php';
-$karyawan = mysqli_query($connect, "select * from karyawan where nomor = 3");
-$SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
+$karyawan = mysqli_query($connect, "select * from sk_talenta");
+$SK = mysqli_fetch_assoc(mysqli_query($connect, "select * from sk_talenta"));
+
+print_r($SK);
 
 class PDF extends FPDF
 {
@@ -31,7 +33,7 @@ class PDF extends FPDF
         $this->Ln(8);
 
         $this->Cell(80);
-        $this->Cell(30, 10, 'Nomor : ' . $SK['nomor'], 0, 0, 'C');
+        $this->Cell(30, 10, 'Nomor : ' . $SK['NOMOR_SK'], 0, 0, 'C');
         $this->Ln(8);
 
         $this->Cell(80);
@@ -39,7 +41,7 @@ class PDF extends FPDF
         $this->Ln(8);
 
         $this->Cell(80);
-        $this->Cell(30, 10, $SK['judul'], 0, 0, 'C');
+        $this->Cell(30, 10, 'PENETAPAN KRiTERIA TELANTA PT PJB', 0, 0, 'C');
         $this->Ln(8);
 
         $this->SetFont('Arial', 'B', 10);
@@ -49,7 +51,7 @@ class PDF extends FPDF
     }
 
     // Tubuh
-    public function Tubuh($arr)
+    public function Tubuh($arr, $arr2)
     {
         $this->SetFont('Arial', '', 11);
         $this->Cell(22, 10, 'Menimbang', 0, 0, 'L');
@@ -76,7 +78,7 @@ class PDF extends FPDF
 
         $this->SetY(119.5);
         $this->SetX(38);
-        $teks = "Memberikan Kriteria Talenta Semester " . $arr['semester'] . " Tahun " . $arr['tahun'] . " kepada Karyawan PT Pembangkitan Jawa Bali, yang namanya tercantum pada lajur 2 daftar lampiran keputusan ini sebagaimana tercantum pada lajur 10 daftar lampiran yang sama.";
+        $teks = "Memberikan Kriteria Talenta Semester " . $arr['SEMESTER'] . " Tahun " . $arr['TAHUN'] . " kepada Karyawan PT Pembangkitan Jawa Bali, yang namanya tercantum pada lajur 2 daftar lampiran keputusan ini sebagaimana tercantum pada lajur 10 daftar lampiran yang sama.";
         $this->MultiCell(160, 5, $teks, 0, 'J');
 
         $this->SetY(133.4);
@@ -85,21 +87,21 @@ class PDF extends FPDF
 
         $this->SetY(136);
         $this->SetX(38);
-        $teks = "Keputusan ini berlaku terhitung mulai tanggal " . $arr['tgl_berlaku'] . " sampai dengan " . $arr['tgl_berakhir'] . ", dengan ketentuan apabila dikemudian hari ternyata terdapat kekeliruan dalam keputusan ini, akan ditinjau dan diperbaiki sebagaimana mestinya.";
+        $teks = "Keputusan ini berlaku terhitung mulai tanggal " . $arr['TGL_AWAL'] . " sampai dengan " . $arr['TGL_AKHIR'] . ", dengan ketentuan apabila dikemudian hari ternyata terdapat kekeliruan dalam keputusan ini, akan ditinjau dan diperbaiki sebagaimana mestinya.";
         $this->MultiCell(160.5, 5, $teks, 0, 'J');
 
         $this->Ln(5);
         $this->Cell(30);
-        $this->Cell(30, 5, 'Ditetapkan di   : ' . $arr['tempat']);
+        $this->Cell(30, 5, 'Ditetapkan di   : Surabaya');
 
         $this->Ln(6);
         $this->Cell(30);
-        $this->Cell(30, 5, 'Pada Tanggal  : ' . $arr['tgl_penetapan']);
+        $this->Cell(30, 5, 'Pada Tanggal  : ' . $arr['TGL_DITETAPKAN']);
 
         $this->SetFont('Arial', '', 10);
         $this->Ln(10);
         $this->Cell(30);
-        $this->Cell(30, 5, 'DIREKTUR SDM DAN ADMINISTRASI,');
+        $this->Cell(30, 5, $arr['JABATAN_DIREKSI']);
 
         $this->Ln(8);
         $this->Cell(35);
@@ -107,11 +109,11 @@ class PDF extends FPDF
 
         $this->Ln(10);
         $this->Cell(30);
-        $this->Cell(30, 5, $arr['kadiv_pmc']);
+        $this->Cell(30, 5, $arr['JABATAN_DIVPMC']);
 
         $this->SetFont('Arial', '', 8);
         $this->Ln();
-        $this->Cell(30, 10, 'KANTOR PUSAT', 0, 0, 'L');
+        $this->Cell(30, 10, $arr['UNIT'], 0, 0, 'L');
 
         $this->Ln(8);
 
@@ -211,14 +213,14 @@ class PDF extends FPDF
         $this->SetFont('Arial', '', 10);
         $this->SetY(-50);
         $this->Cell(20);
-        $this->Cell(30, 10, 'DIREKTUR SDM DAN ADMINISTRASI,', 0, 0, 'C');
+        $this->Cell(30, 10, $SK['JABATAN_DIREKSI'], 0, 0, 'C');
 
         $this->SetY(-35);
         $this->Cell(30, 10, 'ttd', 0, 0, 'C');
 
         $this->SetY(-20);
         $this->SetX(8);
-        $this->Cell(30, 10, $SK['dir_sdm'], 0, 0, 'C');
+        $this->Cell(30, 10, $SK['PEJABAT_DIREKSI'], 0, 0, 'C');
 
         $this->SetY(-55);
         $this->SetX(31.5);
@@ -228,7 +230,7 @@ class PDF extends FPDF
         $this->SetY(-50);
         $this->SetX(60);
         $this->Cell(85);
-        $this->Cell(30, 10, 'KEPALA DIVISI PERFORMANCE MANAGEMENT', 0, 0, 'C');
+        $this->Cell(30, 10, $SK['PEJABAT_DIVPMC'], 0, 0, 'C');
 
         $this->SetY(-45);
         $this->SetX(56.5);
@@ -238,7 +240,7 @@ class PDF extends FPDF
         $this->SetY(-20);
         $this->SetX(34);
         $this->Cell(85);
-        $this->Cell(30, 10, $SK['kadiv_pmc'], 0, 0, 'C');
+        $this->Cell(30, 10, $SK['PEJABAT_DIVPMC'], 0, 0, 'C');
 
         $this->Image('img/stamp.png', 110, 245, 40);
     }
@@ -265,24 +267,24 @@ $row = array();
 $i = 0;
 
 $zip = new ZipArchive;
-$filename = $SK['judul'] . $SK['tahun'] . '.zip';
+$filename = $SK['TAHUN'] . '.zip';
 if ($zip->open($filename, ZipArchive::OVERWRITE)) {
     while ($row = mysqli_fetch_assoc($karyawan)) {
         $pdf = new PDF();
         $pdf->AddPage();
-        $pdf->Tubuh($SK);
+        $pdf->Tubuh($SK, $row);
         $pdf->TableHeader();
         $pdf->SetFont('Arial', '', 7);
 
-        if (ceil($pdf->GetStringWidth($row['nama'])) >= $cellWidth1) {
+        if (ceil($pdf->GetStringWidth($row['NAMA_LENGKAP'])) >= $cellWidth1) {
 
             $textArray = array();
-            $textLength = strlen($row['nama']);
+            $textLength = strlen($row['NAMA_LENGKAP']);
 
             while ($startChar < $textLength) {
                 while ($pdf->GetStringWidth($tmpString) < ($cellWidth1 - $errMargin) && ($startChar + $maxChar) < $textLength) {
                     $maxChar++;
-                    $tmpString = substr($row['nama'], $startChar, $maxChar);
+                    $tmpString = substr($row['NAMA_LENGKAP'], $startChar, $maxChar);
                 }
 
                 $startChar = $startChar + $maxChar;
@@ -298,15 +300,15 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
             $startChar = 0;
         }
 
-        if ($pdf->GetStringWidth($row['jabatan']) > $cellWidth2) {
+        if ($pdf->GetStringWidth($row['JABATAN']) > $cellWidth2) {
 
             $textArray = array();
-            $textLength = strlen($row['jabatan']);
+            $textLength = strlen($row['JABATAN']);
 
             while ($startChar < $textLength) {
                 while ($pdf->GetStringWidth($tmpString) < ($cellWidth2 - $errMargin) && ($startChar + $maxChar) < $textLength) {
                     $maxChar++;
-                    $tmpString = substr($row['jabatan'], $startChar, $maxChar);
+                    $tmpString = substr($row['JABATAN'], $startChar, $maxChar);
                 }
 
                 $startChar = $startChar + $maxChar;
@@ -323,15 +325,15 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
             $startChar = 0;
         }
 
-        if ($pdf->GetStringWidth($row['kriteria']) > $cellWidth3) {
+        if ($pdf->GetStringWidth($row['PENILAIAN_KERJA']) > $cellWidth3) {
 
             $textArray = array();
-            $textLength = strlen($row['kriteria']);
+            $textLength = strlen($row['PENILAIAN_KERJA']);
 
             while ($startChar < $textLength) {
                 while ($pdf->GetStringWidth($tmpString) < ($cellWidth3 - $errMargin) && ($startChar + $maxChar) < $textLength) {
                     $maxChar++;
-                    $tmpString = substr($row['kriteria'], $startChar, $maxChar);
+                    $tmpString = substr($row['PENILAIAN_KERJA'], $startChar, $maxChar);
                 }
                 $startChar = $startChar + $maxChar;
                 array_push($textArray, $tmpString);
@@ -346,7 +348,7 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
             $startChar = 0;
         }
 
-        $pdf->Cell(8, $cellHeight, $row['nomor'], 1, 0, 'C');
+        $pdf->Cell(8, $cellHeight, $row['NOMOR'], 1, 0, 'C');
 
         $xPos = $pdf->GetX();
         $yPos = $pdf->GetY();
@@ -355,26 +357,26 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
             $pdf->SetFont('Arial', '', 6);
         }
 
-        $pdf->MultiCell($cellWidth1, ($cellHeight / $lineName), $row['nama'], 'TB', 'L');
+        $pdf->MultiCell($cellWidth1, ($cellHeight / $lineName), $row['NAMA_LENGKAP'], 'TB', 'L');
         $pdf->SetFont('Arial', '', 7);
         $pdf->SetXY($xPos + $cellWidth1, $yPos);
 
-        $pdf->Cell(17, $cellHeight, $row['nid'], 1, 0, 'C');
+        $pdf->Cell(17, $cellHeight, $row['NID'], 1, 0, 'C');
 
         $xPos = $pdf->GetX();
         $yPos = $pdf->GetY();
-        $pdf->MultiCell($cellWidth2, ($cellHeight / $lineJabatan), $row['jabatan'], 'TB', 'L');
+        $pdf->MultiCell($cellWidth2, ($cellHeight / $lineJabatan), $row['JABATAN'], 'TB', 'L');
         $pdf->SetXY($xPos + $cellWidth2, $yPos);
 
-        $pdf->Cell(11, $cellHeight, $row['unit'], 1, 0, 'C');
-        $pdf->Cell(24, $cellHeight, $row['grade'], 'TB', 0, 'C');
-        $pdf->Cell(17, $cellHeight, $row['tgl_upgrade'], 1, 0, 'C');
-        $pdf->Cell(16.5, $cellHeight, $row['sasaran'], 'TB', 0, 'C');
-        $pdf->Cell(16.5, $cellHeight, $row['individu'], 1, 0, 'C');
+        $pdf->Cell(11, $cellHeight, $row['UNIT'], 1, 0, 'C');
+        $pdf->Cell(24, $cellHeight, $row['GRADE'], 'TB', 0, 'C');
+        $pdf->Cell(17, $cellHeight, $row['TGL_GRADE'], 1, 0, 'C');
+        $pdf->Cell(16.5, $cellHeight, $row['KINERJA'], 'TB', 0, 'C');
+        $pdf->Cell(16.5, $cellHeight, $row['KOMPETENSI'], 1, 0, 'C');
 
         $xPos = $pdf->GetX();
         $yPos = $pdf->GetY();
-        $pdf->MultiCell($cellWidth3, ($cellHeight / $lineKriteria), $row['kriteria'], 1, 'C');
+        $pdf->MultiCell($cellWidth3, ($cellHeight / $lineKriteria), $row['PENILAIAN_KERJA'], 1, 'C');
         $pdf->SetXY($xPos + $cellWidth3, $yPos);
         $pdf->Ln(20);
 
@@ -382,7 +384,9 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
         $lineJabatan = 1;
         $lineKriteria = 1;
         $cellHeight = 5;
-        $dir = $SK['tahun'] . '_' . $row['nid'] . '_' . $SK['semester'] . '.pdf';
+
+
+        $dir = $row['NID'] . '_PENILAIAN_' . $SK['TAHUN'] . '_SEMESTER_' . $SK['SEMESTER'] . '.pdf';
         $pdf->Output('F', $dir);
         $zip->addFile($dir);
         unlink($dir);
