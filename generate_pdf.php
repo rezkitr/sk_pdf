@@ -4,7 +4,7 @@ require 'fpdf.php';
 
 //DATABASE
 include 'koneksi.php';
-$karyawan = mysqli_query($connect, "select * from karyawan");
+$karyawan = mysqli_query($connect, "select * from karyawan where nomor = 1");
 $SK = mysqli_fetch_array(mysqli_query($connect, "select * from surat_keputusan"));
 
 class PDF extends FPDF
@@ -31,7 +31,7 @@ class PDF extends FPDF
         $this->Ln(8);
 
         $this->Cell(80);
-        $this->Cell(30, 10, 'Nomor : ' . $SK['NOMOR_SK'], 0, 0, 'C');
+        $this->Cell(30, 10, 'Nomor : ' . $SK['nomor'], 0, 0, 'C');
         $this->Ln(8);
 
         $this->Cell(80);
@@ -262,11 +262,15 @@ $tmpString = "";
 $line = 1;
 $count;
 $row = array();
-$i = 0;
+
+$attachmentFiles = array();
+$toBeUnlinked = array ();
 
 $zip = new ZipArchive;
 $filename = $SK['judul'] . $SK['tahun'] . '.zip';
-if ($zip->open($filename, ZipArchive::CREATE)) {
+if ($zip->open($filename, ZipArchive::OVERWRITE) !== true) {
+    $zip->open($filename, ZipArchive::CREATE);
+}
     while ($row = mysqli_fetch_assoc($karyawan)) {
         $pdf = new PDF();
         $pdf->AddPage();
@@ -383,14 +387,27 @@ if ($zip->open($filename, ZipArchive::CREATE)) {
         $lineKriteria = 1;
         $cellHeight = 5;
 
-
         $dir = $row['nid'] . '_PENILAIAN_' . $SK['tahun'] . '_SEMESTER_' . $SK['semester'] . '.pdf';
         $pdf->Output('F', $dir);
-        $zip->addFile($dir);
-        unlink($dir);
-        $i++;
+        $attachmentFiles[] = $dir;
+        $toBeUnlinked[] = $dir;
     }
-}
+
+    if(count($attachmentFiles) > 1) {
+        foreach ($attachmentFiles as $file) {
+            $zip->addFile($file);
+        }
+        $zip->close($filename);
+    }
+    else {
+        foreach ($attachmentFiles as $file) {
+            $pdf->Output('D', $file);
+        }
+    }
+    foreach($toBeUnlinked as $file) {
+        unlink($file);
+    }
+
 
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -401,3 +418,4 @@ header("Content-Transfer-Encoding: binary");
 header("Content-Length: " . filesize($filename));
 ob_end_flush();
 @readfile($filename);
+unlink($filename);
