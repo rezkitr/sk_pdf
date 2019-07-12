@@ -31,7 +31,7 @@ class PDF extends FPDF
         $this->Ln(8);
 
         $this->Cell(80);
-        $this->Cell(30, 10, 'Nomor : ' . $SK['NOMOR_SK'], 0, 0, 'C');
+        $this->Cell(30, 10, 'Nomor : ' . $SK['nomor'], 0, 0, 'C');
         $this->Ln(8);
 
         $this->Cell(80);
@@ -275,7 +275,7 @@ if ($zip->open($filename, ZipArchive::OVERWRITE) !== true) {
 while ($row = mysqli_fetch_assoc($karyawan)) {
     $pdf = new PDF();
     $pdf->AddPage();
-    $pdf->Tubuh($SK);
+    $pdf->Tubuh($SK, $row);
     $pdf->TableHeader();
     $pdf->SetFont('Arial', '', 7);
 
