@@ -389,12 +389,7 @@ if ($zip->open($filename, ZipArchive::OVERWRITE)) {
     }
     $zip->close();
 }
-// while (ob_get_level() > 0) {
-//     ob_end_clean();
-// }
-// if (file_exists($filename)) {
-//     unlink($filename);
-// }
+
 header("Pragma: no-cache");
 header("Expires: 0");
 header("Content-Description: File Transfer");
